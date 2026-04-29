@@ -47,7 +47,9 @@ export function ShellProvider({ children, user }: { children: ReactNode; user: S
     fetch(url)
       .then(r => r.json())
       .then((data: Membre[]) => {
-        const state: MembresState = { ...EMPTY_STATE }
+        const state: MembresState = {
+          lovitao: [], tily: [], mpiandalana: [], mpitarika: [], mpiandraikitra: [],
+        }
         data.forEach(m => { if (state[m.sokajy]) state[m.sokajy].push(m) })
         setMembers(state)
       })
