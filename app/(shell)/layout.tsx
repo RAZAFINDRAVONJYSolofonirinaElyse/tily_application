@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { verifyToken } from '@/lib/jwt'
 import { COOKIE } from '@/lib/session'
 import { ShellProvider } from './ShellContext'
-import Sidebar from '@/components/layout/Sidebar'
+import ShellShell from '@/components/layout/ShellShell'
 
 async function ShellLayout({ children }: { children: React.ReactNode }) {
   const jar   = await cookies()
@@ -16,12 +16,7 @@ async function ShellLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <ShellProvider user={user}>
-      <div className="flex h-screen">
-        <Sidebar />
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
-          {children}
-        </main>
-      </div>
+      <ShellShell>{children}</ShellShell>
     </ShellProvider>
   )
 }

@@ -139,7 +139,7 @@ export function Btn({ children, onClick, variant = 'secondary', size = 'md', dis
     ghost:     'bg-transparent border-transparent text-gray-500 hover:text-gray-800',
   }
   return (
-    <button onClick={onClick} disabled={disabled} style={style}
+    <button type="button" onClick={onClick} disabled={disabled} style={style}
       className={`${base} ${sizes[size]} ${variants[variant]} ${className}`}>
       {children}
     </button>
@@ -147,13 +147,13 @@ export function Btn({ children, onClick, variant = 'secondary', size = 'md', dis
 }
 
 // ---- Colored button (for cat actions) ----
-export function CatBtn({ children, onClick, color, light, disabled, size = 'md' }: {
+export function CatBtn({ children, onClick, color, disabled, size = 'md' }: {
   children: React.ReactNode; onClick?: () => void
-  color: string; light: string; disabled?: boolean; size?: 'sm' | 'md'
+  color: string; light?: string; disabled?: boolean; size?: 'sm' | 'md'
 }) {
   return (
     <button
-      onClick={onClick} disabled={disabled}
+      type="button" onClick={onClick} disabled={disabled}
       style={{ background: color, color: '#fff' }}
       className={`inline-flex items-center gap-1 rounded-lg border-0 font-semibold transition-opacity
         hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed
