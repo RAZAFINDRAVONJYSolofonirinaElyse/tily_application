@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { comparePassword, signToken } from '@/lib/auth'
 import { COOKIE } from '@/lib/session'
+import { isValidEmail } from '@/lib/validators'
 import type { SessionUser } from '@/types'
 
 export async function POST(req: NextRequest) {
@@ -9,8 +10,10 @@ export async function POST(req: NextRequest) {
     const { email, password } = await req.json()
     if (!email || !password)
       return NextResponse.json({ error: 'Champs manquants' }, { status: 400 })
+    if (!isValidEmail(email))
+      return NextResponse.json({ error: 'Format email invalide' }, { status: 400 })
 
-    const user = await prisma.user.findUnique({ where: { email } })
+    const user = await prisma.user.findUnique({ where: { email: email.trim().toLowerCase() } })
     if (!user || !user.isActive)
       return NextResponse.json({ error: 'Email ou mot de passe incorrect' }, { status: 401 })
 

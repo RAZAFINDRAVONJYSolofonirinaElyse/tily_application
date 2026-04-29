@@ -19,6 +19,7 @@ import {
   PageHeader, Empty, ConfirmModal, StatCard,
 } from '@/components/atoms'
 import { printFiche, printFDP, printTeknika, printFafiList } from '@/lib/print'
+import { optionalEmail, optionalPhone, requireMin } from '@/lib/validators'
 
 // ============================================================
 //  API helpers
@@ -448,6 +449,22 @@ export function MembreForm({ cat, initial, onSave, onCancel }: MembreFormProps) 
   const fane1: FanekenaItem = m.fanekena[1] ?? { daty: '', toerana: '', andraikitra: '' }
   const faneN = m.fanekena.slice(2)
 
+  const [saveError, setSaveError] = useState<string | null>(null)
+
+  const handleSave = () => {
+    const errs: string[] = []
+    const anarana = requireMin(m.anarana, 2)
+    if (anarana) errs.push(`Anarana: ${anarana}`)
+    const emailErr = optionalEmail(m.email)
+    if (emailErr) errs.push(`Email: ${emailErr}`)
+    const findayErr = optionalPhone(m.finday)
+    if (findayErr) errs.push(`Finday: ${findayErr}`)
+    if ((m.zanakaIsa ?? 0) < 0) errs.push('Isan\'ny zanaka: tsy afaka negatifa')
+    if (errs.length > 0) { setSaveError(errs.join(' · ')); return }
+    setSaveError(null)
+    onSave(m)
+  }
+
   const commonHeader = (
     <>
       <PageHeader
@@ -456,10 +473,15 @@ export function MembreForm({ cat, initial, onSave, onCancel }: MembreFormProps) 
         actions={
           <>
             <Btn onClick={onCancel}><LuX size={14} /> Hiala</Btn>
-            <CatBtn color={v.color} light={v.light} onClick={() => onSave(m)}><LuSave size={14} /> Hitahiry</CatBtn>
+            <CatBtn color={v.color} light={v.light} onClick={handleSave}><LuSave size={14} /> Hitahiry</CatBtn>
           </>
         }
       />
+      {saveError && (
+        <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+          {saveError}
+        </div>
+      )}
       <Sec title="Taom-panabeazana & Numero kara">
         <Grid cols={2}>
           <YearSel value={m.taomPanabeazana} onChange={f('taomPanabeazana') as (v: string) => void} />
@@ -970,6 +992,7 @@ export function FDPModule({ taomDefault }: { taomDefault: string }) {
   const openEdit = (item: FDP) => { setFdp(item); setMode('form') }
 
   const save = async () => {
+    if (!fdp.taomPanabeazana) { alert('Mila taom-panabeazana'); return }
     setSaving(true)
     try {
       const isNew = !fdp.id
@@ -1193,6 +1216,7 @@ export function TeknikaModule({ taomDefault }: { taomDefault: string }) {
   const openEdit = (item: Teknika) => { setTek(item); setMode('form') }
 
   const save = async () => {
+    if (!tek.taomPanabeazana) { alert('Mila taom-panabeazana'); return }
     setSaving(true)
     try {
       const isNew = !tek.id

@@ -3,51 +3,74 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { LuEye, LuEyeOff } from 'react-icons/lu'
+import { isValidEmail, requireMin, requireEmail, requirePassword } from '@/lib/validators'
 
 const SAMPANA_LABELS: Record<string, string> = {
   lovitao: 'Lovitao', tily: 'Tily',
   mpiandalana: 'Mpiandalana', mpitarika: 'Mpitarika', tonia: 'Tonia',
 }
 
+type FormData = { nom: string; prenoms: string; email: string; password: string; confirm: string; sampana: string }
+
 export default function RegisterPage() {
   const router = useRouter()
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormData>({
     nom: '', prenoms: '', email: '', password: '', confirm: '', sampana: 'tily',
   })
   const [showPwd, setShowPwd]         = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [error, setError]             = useState('')
+  const [errors, setErrors]           = useState<Record<string, string>>({})
+  const [serverError, setServerError] = useState('')
   const [success, setSuccess]         = useState(false)
   const [loading, setLoading]         = useState(false)
 
-  const f = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm(p => ({ ...p, [k]: e.target.value }))
+  const validate = (f: FormData): Record<string, string> => {
+    const e: Record<string, string> = {}
+    const nom = requireMin(f.nom, 2)
+    if (nom) e.nom = nom
+    const prenoms = requireMin(f.prenoms, 2)
+    if (prenoms) e.prenoms = prenoms
+    const email = requireEmail(f.email)
+    if (email) e.email = email
+    const pwd = requirePassword(f.password)
+    if (pwd) e.password = pwd
+    if (!f.confirm)                        e.confirm = 'Tsy maintsy feno'
+    else if (f.password !== f.confirm)     e.confirm = 'Ny teny miafina roa dia tsy mitovy'
+    return e
+  }
 
-  const pwdMismatch = form.confirm.length > 0 && form.password !== form.confirm
+  const updateField = (k: keyof FormData, v: string) => {
+    const updated = { ...form, [k]: v }
+    setForm(updated)
+    // Re-valider ce champ si des erreurs sont déjà affichées
+    if (Object.keys(errors).length > 0) {
+      const fresh = validate(updated)
+      setErrors(prev => ({ ...prev, [k]: fresh[k] ?? '' }))
+    }
+  }
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (form.password !== form.confirm) {
-      setError('Ny teny miafina roa dia tsy mitovy')
-      return
-    }
-    setError('')
+    const errs = validate(form)
+    if (Object.keys(errs).length > 0) { setErrors(errs); return }
+    setErrors({})
+    setServerError('')
     setLoading(true)
     try {
       const { confirm: _, ...body } = form
       const res  = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ ...body, email: body.email.trim(), nom: body.nom.trim(), prenoms: body.prenoms.trim() }),
       })
       const data = await res.json()
-      if (!res.ok) { setError(data.error); return }
+      if (!res.ok) { setServerError(data.error); return }
       if (data.isApproved) {
         router.push('/login')
       } else {
         setSuccess(true)
       }
-    } catch { setError('Erreur réseau') }
+    } catch { setServerError('Erreur réseau') }
     finally { setLoading(false) }
   }
 
@@ -62,26 +85,34 @@ export default function RegisterPage() {
     </div>
   )
 
+  const E = ({ k }: { k: string }) =>
+    errors[k] ? <p className="mt-1 text-[11px] text-red-600">{errors[k]}</p> : null
+
+  const errClass = (k: string) =>
+    errors[k] ? 'border-red-400 bg-red-50 focus:ring-red-300' : ''
+
   return (
     <div className="card">
       <h1 className="mb-6 text-center text-xl font-bold text-gray-900">Hisoratra</h1>
-      <form onSubmit={submit} className="space-y-4">
+      <form onSubmit={submit} className="space-y-4" noValidate>
 
         {/* Nom / Prénoms */}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="mb-1 block text-xs font-medium text-gray-500">Nom</label>
             <input
-              value={form.nom} onChange={f('nom')}
-              className="w-full" required disabled={loading}
+              value={form.nom} onChange={e => updateField('nom', e.target.value)}
+              className={`w-full ${errClass('nom')}`} disabled={loading}
             />
+            <E k="nom" />
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-gray-500">Prénoms</label>
             <input
-              value={form.prenoms} onChange={f('prenoms')}
-              className="w-full" required disabled={loading}
+              value={form.prenoms} onChange={e => updateField('prenoms', e.target.value)}
+              className={`w-full ${errClass('prenoms')}`} disabled={loading}
             />
+            <E k="prenoms" />
           </div>
         </div>
 
@@ -89,9 +120,11 @@ export default function RegisterPage() {
         <div>
           <label className="mb-1 block text-xs font-medium text-gray-500">Adiresy mailaka</label>
           <input
-            type="email" value={form.email} onChange={f('email')}
-            className="w-full" required disabled={loading}
+            type="email" value={form.email} onChange={e => updateField('email', e.target.value)}
+            placeholder="email@exemple.mg"
+            className={`w-full ${errClass('email')}`} disabled={loading}
           />
+          <E k="email" />
         </div>
 
         {/* Mot de passe */}
@@ -100,17 +133,15 @@ export default function RegisterPage() {
           <div className="relative">
             <input
               type={showPwd ? 'text' : 'password'}
-              value={form.password} onChange={f('password')}
-              className="w-full pr-9" minLength={6} required disabled={loading}
+              value={form.password} onChange={e => updateField('password', e.target.value)}
+              className={`w-full pr-9 ${errClass('password')}`} disabled={loading}
             />
-            <button
-              type="button" tabIndex={-1}
-              onClick={() => setShowPwd(p => !p)}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-            >
+            <button type="button" tabIndex={-1} onClick={() => setShowPwd(p => !p)}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
               {showPwd ? <LuEyeOff size={15} /> : <LuEye size={15} />}
             </button>
           </div>
+          <E k="password" />
         </div>
 
         {/* Confirmer le mot de passe */}
@@ -119,28 +150,22 @@ export default function RegisterPage() {
           <div className="relative">
             <input
               type={showConfirm ? 'text' : 'password'}
-              value={form.confirm} onChange={f('confirm')}
-              className={`w-full pr-9 ${pwdMismatch ? 'border-red-400 bg-red-50 focus:ring-red-300' : ''}`}
-              required disabled={loading}
+              value={form.confirm} onChange={e => updateField('confirm', e.target.value)}
+              className={`w-full pr-9 ${errClass('confirm')}`} disabled={loading}
             />
-            <button
-              type="button" tabIndex={-1}
-              onClick={() => setShowConfirm(p => !p)}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-            >
+            <button type="button" tabIndex={-1} onClick={() => setShowConfirm(p => !p)}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
               {showConfirm ? <LuEyeOff size={15} /> : <LuEye size={15} />}
             </button>
           </div>
-          {pwdMismatch && (
-            <p className="mt-1 text-[11px] text-red-600">Ny teny miafina roa dia tsy mitovy</p>
-          )}
+          <E k="confirm" />
         </div>
 
         {/* Sampana */}
         <div>
           <label className="mb-1 block text-xs font-medium text-gray-500">Sampana</label>
           <select
-            value={form.sampana} onChange={f('sampana')}
+            value={form.sampana} onChange={e => updateField('sampana', e.target.value)}
             className="w-full" disabled={loading}
           >
             {Object.entries(SAMPANA_LABELS).map(([k, v]) => (
@@ -149,11 +174,12 @@ export default function RegisterPage() {
           </select>
         </div>
 
-        {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {serverError && (
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{serverError}</p>
+        )}
 
         <button
-          type="submit"
-          disabled={loading || pwdMismatch}
+          type="submit" disabled={loading}
           className="w-full rounded-lg bg-scout-dark py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? 'Miandry...' : 'Hisoratra'}
