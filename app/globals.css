@@ -1,26 +1,105 @@
 @import "tailwindcss";
+@reference "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-scout-dark: #622599;
+  --color-scout-mid: #7A2EB8;
+  --color-scout-accent: #EFC100;
+
+  --color-lovitao: #EFC100;
+  --color-lovitao-light: #FEF9E0;
+  --color-lovitao-dot: #EFC100;
+
+  --color-tily: #00911B;
+  --color-tily-light: #E6F7E9;
+  --color-tily-dot: #00911B;
+
+  --color-mpiandalana: #EF0013;
+  --color-mpiandalana-light: #FEE6E8;
+  --color-mpiandalana-dot: #EF0013;
+
+  --color-mpitarika: #6D071A;
+  --color-mpitarika-light: #FBF0F2;
+  --color-mpitarika-dot: #6D071A;
+
+  --color-mpiandraikitra: #0041A0;
+  --color-mpiandraikitra-light: #E6EEF8;
+  --color-mpiandraikitra-dot: #0041A0;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --font-sans: 'Inter', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+    font-family: var(--font-sans);
+  }
+
+  input:not([type='radio']):not([type='checkbox']):not([type='range']),
+  select,
+  textarea {
+    @apply w-full rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm
+           text-gray-900 outline-none transition-colors
+           focus:border-gray-400 focus:ring-0
+           placeholder:text-gray-400;
+    font-family: inherit;
+  }
+
+  input[type='range'] {
+    width: 100%;
+    accent-color: #28543a;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .card {
+    @apply rounded-xl border border-gray-200 bg-white p-4 shadow-sm;
+  }
+
+  .section-title {
+    @apply mb-3 text-[10px] font-bold uppercase tracking-widest text-gray-400;
+  }
+
+  .table-th {
+    @apply border border-gray-200 bg-gray-50 px-3 py-2 text-left text-[11px]
+           font-bold text-gray-500;
+  }
+
+  .table-td {
+    @apply border border-gray-200 px-3 py-2 text-sm;
+  }
+
+  .table-input {
+    @apply h-full w-full border-0 bg-transparent px-2 py-1.5 text-sm
+           outline-none focus:bg-blue-50/30;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px]
+           font-bold border;
+  }
+
+  .sidebar-link {
+    @apply flex w-full items-center border-l-2 px-4 py-2.5 text-xs
+           transition-colors cursor-pointer border-transparent text-white/60
+           hover:bg-white/10 hover:text-white/90;
+  }
+
+  .sidebar-link-active {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: white;
+    border-color: #EFC100;
+  }
+
+  .progress-bar {
+    @apply h-1.5 w-full overflow-hidden rounded-full bg-gray-100;
+  }
+
+  .fade-in {
+    animation: fadeIn 0.2s ease-out;
+  }
 }

@@ -1,0 +1,295 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================
+//  ENUMS
+// ============================================================
+enum SokajyType {
+  lovitao
+  tily
+  mpiandalana
+  mpitarika
+  mpiandraikitra
+}
+
+enum SexeType {
+  lahy
+  vavy
+}
+
+enum FafiStatut {
+  nandoa
+  ampahany
+  tsy_nandoa
+}
+
+// ============================================================
+//  MEMBRE
+// ============================================================
+model Membre {
+  id                   Int        @id @default(autoincrement())
+  numeroCarte          String?    @unique @db.VarChar(12)
+  sokajy               SokajyType
+  taomPanabeazana      String     @db.VarChar(9)
+
+  // Identity
+  anarana              String     @db.VarChar(100)
+  fanampiny            String?    @db.VarChar(100)
+  datyNahaterahana     DateTime?  @db.Date
+  toeraNahaterahana    String?    @db.VarChar(200)
+  sex                  SexeType   @default(lahy)
+  iraitampo            String?    @db.VarChar(10)
+
+  // Parents
+  rayAnarana           String?    @db.VarChar(200)
+  rayAsa               String?    @db.VarChar(200)
+  renyAnarana          String?    @db.VarChar(200)
+  renyAsa              String?    @db.VarChar(200)
+
+  // Contact
+  finday               String?    @db.VarChar(50)
+  adiresy              String?
+  email                String?    @db.VarChar(200)
+
+  // School / Church
+  kilasy               String?    @db.VarChar(100)
+  piangonanaKilasy     String?    @db.VarChar(200)
+  sekolyAlahady        Boolean    @default(false)
+  sampanaPiangonana    String?    @db.VarChar(200)
+
+  // Scout history
+  lidiRaLovitao        String?    @db.VarChar(50)
+  tilyMaitso           String?    @db.VarChar(50)
+  fanasan              Boolean    @default(false)
+  mpanantona           Boolean    @default(false)
+  sampanaRaisina       String?    @db.VarChar(200)
+
+  // Health
+  aretina              String?
+  sakafo               String?
+  toetraManokana       String?
+  tenyRaaman           String?
+
+  // Mpitarika specific
+  asaAtao              String?    @db.VarChar(200)
+  fahaizana            String?
+  traikefa             String?
+  mpiandalanaGrade     String?    @db.VarChar(100)
+  menafifyGrade        String?    @db.VarChar(100)
+
+  // Mpiandraikitra specific
+  fiantso              String?    @db.VarChar(200)
+  andraikitrePoste     String?    @db.VarChar(200)
+  manambady            Boolean    @default(false)
+  zanakaIsa            Int        @default(0)
+  fiangonana           String?    @db.VarChar(200)
+  fivondronana         String?    @db.VarChar(200)
+
+  saryUrl              String?
+
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+
+  // Relations
+  ambaratonga          Ambaratonga[]
+  fanekena             Fanekena[]
+  fafi                 Fafi[]
+
+  @@index([sokajy])
+  @@index([taomPanabeazana])
+  @@index([numeroCarte])
+  @@map("membres")
+}
+
+// ============================================================
+//  AMBARATONGA
+// ============================================================
+model Ambaratonga {
+  id        Int      @id @default(autoincrement())
+  membre    Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  membreId  Int
+  label     String   @db.VarChar(100)
+  ordre     Int      @default(0)
+  daty      DateTime? @db.Date
+  talenta   String?
+  talenDaty DateTime? @db.Date
+
+  createdAt DateTime @default(now())
+
+  @@index([membreId])
+  @@map("ambaratonga")
+}
+
+// ============================================================
+//  FANEKENA
+// ============================================================
+model Fanekena {
+  id          Int      @id @default(autoincrement())
+  membre      Membre   @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  membreId    Int
+  sokajyFane  String   @default("fanekena") @db.VarChar(50)
+  daty        DateTime? @db.Date
+  toerana     String?  @db.VarChar(200)
+  andraikitra String?  @db.VarChar(200)
+
+  createdAt   DateTime @default(now())
+
+  @@index([membreId])
+  @@map("fanekena")
+}
+
+// ============================================================
+//  FANDAHARAM-PANABEAZANA
+// ============================================================
+model FandaharamPanabeazana {
+  id               Int        @id @default(autoincrement())
+  taomPanabeazana  String     @db.VarChar(9)
+  sokajy           SokajyType?
+  faritany         String?    @db.VarChar(200)
+  fivondronana     String?    @db.VarChar(200)
+  faritra          String?    @db.VarChar(200)
+  sampana          String?    @db.VarChar(200)
+  quarter          String?    @db.VarChar(50)
+  months           Int        @default(3)
+  tanjona          String?
+  kendrena         Json       @default("[]")
+
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  rows             FdpRow[]
+
+  @@index([taomPanabeazana])
+  @@map("fandaharam_panabeazana")
+}
+
+model FdpRow {
+  id          Int                   @id @default(autoincrement())
+  fdp         FandaharamPanabeazana @relation(fields: [fdpId], references: [id], onDelete: Cascade)
+  fdpId       Int
+  ordre       Int                   @default(0)
+  daty        DateTime?             @db.Date
+  lohahevitra String?
+  sehatra     String?               @db.VarChar(200)
+  fomba       String?               @db.VarChar(200)
+  toerana     String?               @db.VarChar(200)
+
+  @@index([fdpId])
+  @@map("fdp_rows")
+}
+
+// ============================================================
+//  FISY TEKNIKA
+// ============================================================
+model FisyTeknika {
+  id              Int         @id @default(autoincrement())
+  taomPanabeazana String      @db.VarChar(9)
+  sokajy          SokajyType?
+  sampana         String?     @db.VarChar(200)
+  daty            DateTime?   @db.Date
+  tanjona         String?
+  kendrena        Json        @default("[]")
+  faharetany      String?     @db.VarChar(100)
+  toerana         String?     @db.VarChar(200)
+  vontoatiny      String?
+  tombane         String?
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  rows            TeknikaRow[]
+
+  @@index([taomPanabeazana])
+  @@map("fisy_teknika")
+}
+
+model TeknikaRow {
+  id                 Int         @id @default(autoincrement())
+  teknika            FisyTeknika @relation(fields: [teknikaId], references: [id], onDelete: Cascade)
+  teknikaId          Int
+  ordre              Int         @default(0)
+  ora                String?     @db.VarChar(8)
+  atao               String?
+  fomba              String?
+  tomponAndraikitra  String?     @db.VarChar(200)
+  fitaovana          String?
+  fanamarihana       String?
+
+  @@index([teknikaId])
+  @@map("teknika_rows")
+}
+
+// ============================================================
+//  UTILISATEURS & AUTHENTIFICATION
+// ============================================================
+enum UserSampana {
+  lovitao
+  tily
+  mpiandalana
+  mpitarika
+  tonia
+}
+
+model User {
+  id           Int         @id @default(autoincrement())
+  nom          String      @db.VarChar(100)
+  prenoms      String      @db.VarChar(200)
+  email        String      @unique @db.VarChar(200)
+  password     String
+  sampana      UserSampana
+  isApproved   Boolean     @default(false)
+  isSuperAdmin Boolean     @default(false)
+  isActive     Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  auditLogs    AuditLog[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  action    String   @db.VarChar(50)
+  entity    String   @db.VarChar(50)
+  entityId  Int?
+  details   Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ============================================================
+//  FAFI — Insurance / Membership Fee
+// ============================================================
+model Fafi {
+  id               Int        @id @default(autoincrement())
+  membre           Membre     @relation(fields: [membreId], references: [id], onDelete: Cascade)
+  membreId         Int
+  taomPanabeazana  String     @db.VarChar(9)
+  datyFandoavana   DateTime?  @db.Date
+  volaNaloa        Decimal?   @db.Decimal(12, 2)
+  statut           FafiStatut @default(tsy_nandoa)
+  mpandray         String?    @db.VarChar(200)
+  fanamarihana     String?
+
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  @@unique([membreId, taomPanabeazana])
+  @@index([membreId])
+  @@index([taomPanabeazana])
+  @@index([statut])
+  @@map("fafi")
+}

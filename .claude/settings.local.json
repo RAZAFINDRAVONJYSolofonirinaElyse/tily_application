@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(openssl rand *)",
+      "Bash(echo \"JWT_SECRET=\\\\\"tily-scout-jwt-secret-$\\(openssl rand -hex 16\\)\\\\\"\")"
+    ]
+  }
+}
