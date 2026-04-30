@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import ServiceWorker from "@/components/ServiceWorker"
+import PWAInstallBanner from "@/components/PWAInstallBanner"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
