@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
     if (membres.length > 0) {
       await prisma.fafi.createMany({
-        data: membres.map(m => ({
+        data: membres.map((m: { id: number }) => ({
           membreId:       m.id,
           taomPanabeazana,
           statut:         'tsy_nandoa' as const,
