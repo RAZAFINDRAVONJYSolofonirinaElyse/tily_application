@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
       orderBy: [{ membre: { sokajy: 'asc' } }, { membre: { anarana: 'asc' } }],
     })
 
-    const flat = list.map(f => ({
+    const flat = list.map((f: typeof list[number]) => ({
       id:              f.id,
       membreId:        f.membreId,
       taomPanabeazana: f.taomPanabeazana,

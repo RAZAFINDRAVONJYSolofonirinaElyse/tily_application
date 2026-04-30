@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
       include: includeRelations,
       orderBy: { anarana: 'asc' },
     })
-    const data = membres.map(m => ({
+    const data = membres.map((m: typeof membres[number]) => ({
       ...m, ambDone: m.ambaratonga.filter(a => a.daty !== null).length, ambTotal: m.ambaratonga.length,
     }))
     return NextResponse.json(data)
