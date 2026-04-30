@@ -254,7 +254,7 @@ export function AdminModule() {
                   <td className="table-td">{SAMPANA_LABELS[u.sampana] ?? u.sampana}</td>
                   <td className="table-td">
                     {u.isApproved
-                      ? <span className="rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-semibold text-green-700">Voaraisina</span>
+                      ? <span className="rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-semibold text-green-700">Voaray</span>
                       : <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">Miandry</span>
                     }
                   </td>
@@ -278,7 +278,7 @@ export function AdminModule() {
                       {u.isApproved && u.isActive && !u.isSuperAdmin && (
                         <Btn size="sm" variant="danger" disabled={saving === u.id}
                           onClick={() => patch(u.id, { isActive: false })}>
-                          <LuUserX size={13} /> Antsojy
+                          <LuUserX size={13} /> Esorina
                         </Btn>
                       )}
                       {!u.isActive && (

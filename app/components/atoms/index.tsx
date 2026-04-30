@@ -2,6 +2,7 @@
 // src/components/atoms/index.tsx — Tailwind UI atoms
 
 import React from 'react'
+import { createPortal } from 'react-dom'
 import { LuX, LuTrash2, LuLogOut } from 'react-icons/lu'
 import { CATS, YEARS, SokajyType } from '@/types'
 
@@ -266,7 +267,7 @@ export function ConfirmModal({ title, message, confirmLabel, variant = 'danger',
   onCancel: () => void
 }) {
   const isDanger = variant === 'danger'
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
       onClick={onCancel}
@@ -290,7 +291,8 @@ export function ConfirmModal({ title, message, confirmLabel, variant = 'danger',
           </Btn>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
