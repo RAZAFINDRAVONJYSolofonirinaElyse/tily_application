@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { getSession, authError, canModify } from '@/lib/session'
 import { log } from '@/lib/audit'
@@ -22,7 +23,7 @@ export async function PUT(req: NextRequest, context: Params) {
     if (!canModify(user!, existing.sokajy))
       return NextResponse.json({ error: 'Permission refusée' }, { status: 403 })
 
-    await prisma.$transaction(async tx => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.fisyTeknika.update({
         where: { id },
         data:  { ...data, daty: data.daty ? new Date(data.daty) : null },

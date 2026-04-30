@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { getSession, authError, canModify } from '@/lib/session'
 import { log } from '@/lib/audit'
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
     if (!canModify(user!, data.sokajy))
       return NextResponse.json({ error: 'Permission refusée pour cette sokajy' }, { status: 403 })
 
-    const membre = await prisma.$transaction(async tx => {
+    const membre = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const m = await tx.membre.create({
         data: {
           ...data,
