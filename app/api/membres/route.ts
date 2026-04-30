@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
       orderBy: { anarana: 'asc' },
     })
     const data = membres.map((m: typeof membres[number]) => ({
-      ...m, ambDone: m.ambaratonga.filter(a => a.daty !== null).length, ambTotal: m.ambaratonga.length,
+      ...m, ambDone: m.ambaratonga.filter((a: { daty: unknown }) => a.daty !== null).length, ambTotal: m.ambaratonga.length,
     }))
     return NextResponse.json(data)
   } catch (e) {

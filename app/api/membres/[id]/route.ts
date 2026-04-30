@@ -19,7 +19,7 @@ export async function GET(_req: NextRequest, context: Params) {
     const id = Number(idParam)
     const membre = await prisma.membre.findUnique({ where: { id }, include: includeRelations })
     if (!membre) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-    return NextResponse.json({ ...membre, ambDone: membre.ambaratonga.filter(a => a.daty).length, ambTotal: membre.ambaratonga.length })
+    return NextResponse.json({ ...membre, ambDone: membre.ambaratonga.filter((a: { daty: unknown }) => a.daty).length, ambTotal: membre.ambaratonga.length })
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message }, { status: 500 })
   }
@@ -60,7 +60,7 @@ export async function PUT(req: NextRequest, context: Params) {
 
     const full = await prisma.membre.findUnique({ where: { id }, include: includeRelations })
     await log(user!, 'UPDATE', 'membre', id, { anarana: full?.anarana, sokajy: full?.sokajy })
-    return NextResponse.json({ ...full, ambDone: full!.ambaratonga.filter(a => a.daty).length, ambTotal: full!.ambaratonga.length })
+    return NextResponse.json({ ...full, ambDone: full!.ambaratonga.filter((a: { daty: unknown }) => a.daty).length, ambTotal: full!.ambaratonga.length })
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message }, { status: 500 })
   }
