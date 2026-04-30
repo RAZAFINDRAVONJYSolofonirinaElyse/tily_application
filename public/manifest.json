@@ -1,24 +1,33 @@
 {
+  "id": "/",
   "name": "Tily Eto Madagasikara",
   "short_name": "Tily",
   "description": "Application de gestion des membres scouts",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#f9fafb",
   "theme_color": "#622599",
   "orientation": "portrait-primary",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/LogoTily.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/LogoTily.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/LogoTily.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
