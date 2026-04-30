@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { getSession, authError, canModify } from '@/lib/session'
 import { log } from '@/lib/audit'
+
+type TX = Parameters<Parameters<typeof prisma.$transaction>[0]>[0]
 
 type Params = { params: Promise<{ id: string }> }
 const include = { rows: { orderBy: { ordre: 'asc' as const } } }
@@ -23,7 +24,7 @@ export async function PUT(req: NextRequest, context: Params) {
     if (!canModify(user!, existing.sokajy))
       return NextResponse.json({ error: 'Permission refusée' }, { status: 403 })
 
-    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    await prisma.$transaction(async (tx: TX) => {
       await tx.fandaharamPanabeazana.update({ where: { id }, data })
       if (rows) {
         await tx.fdpRow.deleteMany({ where: { fdpId: id } })

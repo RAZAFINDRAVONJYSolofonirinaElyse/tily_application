@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
+
+type TX = Parameters<Parameters<typeof prisma.$transaction>[0]>[0]
 import { getSession, authError, canModify } from '@/lib/session'
 import { log } from '@/lib/audit'
 import { SokajyType } from '@/types'
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
     if (!canModify(user!, data.sokajy))
       return NextResponse.json({ error: 'Permission refusée pour cette sokajy' }, { status: 403 })
 
-    const membre = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    const membre = await prisma.$transaction(async (tx: TX) => {
       const m = await tx.membre.create({
         data: {
           ...data,
@@ -85,7 +86,7 @@ export async function POST(req: NextRequest) {
 
     await log(user!, 'CREATE', 'membre', membre.id, { anarana: membre.anarana, sokajy: membre.sokajy })
     return NextResponse.json(
-      { ...membre, ambDone: membre.ambaratonga.filter(a => a.daty).length, ambTotal: membre.ambaratonga.length },
+      { ...membre, ambDone: membre.ambaratonga.filter((a: { daty: unknown }) => a.daty).length, ambTotal: membre.ambaratonga.length },
       { status: 201 }
     )
   } catch (e) {
