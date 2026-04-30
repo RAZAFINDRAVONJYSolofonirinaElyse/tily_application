@@ -6,4 +6,4 @@ export default withPWA({
   cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,
   reloadOnOnline: true,
-})({})
+})({ turbopack: {} })
