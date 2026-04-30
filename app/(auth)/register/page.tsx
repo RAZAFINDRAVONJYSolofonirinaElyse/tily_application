@@ -99,7 +99,7 @@ export default function RegisterPage() {
         {/* Nom / Prénoms */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-500">Nom</label>
+            <label className="mb-1 block text-xs font-medium text-gray-500">Anarana</label>
             <input
               value={form.nom} onChange={e => updateField('nom', e.target.value)}
               className={`w-full ${errClass('nom')}`} disabled={loading}
@@ -107,7 +107,7 @@ export default function RegisterPage() {
             <E k="nom" />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-500">Prénoms</label>
+            <label className="mb-1 block text-xs font-medium text-gray-500">Fanampin'anarana</label>
             <input
               value={form.prenoms} onChange={e => updateField('prenoms', e.target.value)}
               className={`w-full ${errClass('prenoms')}`} disabled={loading}
