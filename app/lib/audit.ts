@@ -1,5 +1,4 @@
 import { prisma } from './prisma'
-import { Prisma } from '@prisma/client'
 import type { SessionUser } from '@/types'
 
 export async function log(
@@ -10,6 +9,6 @@ export async function log(
   details?: Record<string, unknown>,
 ) {
   try {
-    await prisma.auditLog.create({ data: { userId: user.userId, action, entity, entityId, details: details as Prisma.InputJsonObject | undefined } })
+    await prisma.auditLog.create({ data: { userId: user.userId, action, entity, entityId, details: details as never } })
   } catch { /* log failure must never break the request */ }
 }
