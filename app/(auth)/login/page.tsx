@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { LuEye, LuEyeOff } from 'react-icons/lu'
 import { isValidEmail } from '@/lib/validators'
+
+const TOKEN_KEY = 'tily_token'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -12,7 +14,22 @@ export default function LoginPage() {
   const [showPwd, setShowPwd]   = useState(false)
   const [errors, setErrors]     = useState<Record<string, string>>({})
   const [serverError, setServerError] = useState('')
-  const [loading, setLoading]   = useState(false)
+  const [loading, setLoading]   = useState(true)
+
+  useEffect(() => {
+    const saved = localStorage.getItem(TOKEN_KEY)
+    if (!saved) { setLoading(false); return }
+    fetch('/api/auth/restore', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: saved }),
+    })
+      .then(r => {
+        if (r.ok) { router.replace('/'); router.refresh() }
+        else { localStorage.removeItem(TOKEN_KEY); setLoading(false) }
+      })
+      .catch(() => { localStorage.removeItem(TOKEN_KEY); setLoading(false) })
+  }, [router])
 
   const validate = () => {
     const e: Record<string, string> = {}
@@ -38,6 +55,7 @@ export default function LoginPage() {
       })
       const data = await res.json()
       if (!res.ok) { setServerError(data.error); return }
+      if (data._token) localStorage.setItem(TOKEN_KEY, data._token)
       if (!data.isApproved) {
         router.push('/pending')
       } else {
@@ -56,6 +74,12 @@ export default function LoginPage() {
     setPassword(v)
     if (errors.password) setErrors(p => ({ ...p, password: '' }))
   }
+
+  if (loading) return (
+    <div className="flex min-h-screen items-center justify-center">
+      <p className="text-sm text-gray-400">Miandry...</p>
+    </div>
+  )
 
   return (
     <div className="card">

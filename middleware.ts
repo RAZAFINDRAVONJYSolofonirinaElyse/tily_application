@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/jwt'
 import { COOKIE } from '@/lib/session'
 
-const PUBLIC = ['/login', '/register', '/api/auth']
+const PUBLIC = ['/login', '/register', '/pending', '/api/auth']
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl

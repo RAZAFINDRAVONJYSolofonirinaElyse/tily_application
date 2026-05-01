@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     }
 
     const token = await signToken(session)
-    const res   = NextResponse.json(session)
+    const res   = NextResponse.json({ ...session, _token: token })
     res.cookies.set(COOKIE, token, {
       httpOnly: true, sameSite: 'lax', path: '/',
       maxAge: 60 * 60 * 24 * 30,
