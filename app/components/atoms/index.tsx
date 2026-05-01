@@ -209,10 +209,65 @@ export function ProgressBar({ pct, color, height = 6 }: { pct: number; color: st
 export function YearSel({ value, onChange, label = 'Taom-panabeazana' }: {
   value: string; onChange: (v: string) => void; label?: string
 }) {
+  const [extra, setExtra] = React.useState<string[]>([])
+  const [adding, setAdding] = React.useState(false)
+  const [newYear, setNewYear] = React.useState('')
+
+  React.useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('extra-taom') ?? '[]')
+      if (Array.isArray(stored)) setExtra(stored)
+    } catch {}
+  }, [])
+
+  const allYears = [...new Set([...YEARS, ...extra])].sort()
+
+  const addYear = () => {
+    if (!/^\d{4}-\d{4}$/.test(newYear)) return
+    const [a, b] = newYear.split('-').map(Number)
+    if (b !== a + 1) return
+    if (allYears.includes(newYear)) { setAdding(false); onChange(newYear); return }
+    const next = [...extra, newYear]
+    setExtra(next)
+    localStorage.setItem('extra-taom', JSON.stringify(next))
+    onChange(newYear)
+    setNewYear('')
+    setAdding(false)
+  }
+
   return (
-    <Sel label={label} value={value} onChange={onChange}>
-      {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-    </Sel>
+    <Field label={label}>
+      <div className="flex flex-col gap-1">
+        <div className="flex gap-1">
+          <select value={value ?? ''} onChange={e => onChange(e.target.value)} className="flex-1">
+            {allYears.map(y => <option key={y} value={y}>{y}</option>)}
+          </select>
+          <button
+            type="button"
+            onClick={() => { setAdding(v => !v); setNewYear('') }}
+            className="shrink-0 rounded border border-gray-300 px-2 text-sm text-gray-500 hover:bg-gray-50"
+            title="Ajouter un taom-panabeazana"
+          >+</button>
+        </div>
+        {adding && (
+          <div className="flex gap-1">
+            <input
+              type="text"
+              placeholder="ex: 2031-2032"
+              value={newYear}
+              onChange={e => setNewYear(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') addYear() }}
+              className="flex-1 text-xs"
+            />
+            <button
+              type="button"
+              onClick={addYear}
+              className="shrink-0 rounded bg-blue-600 px-2 text-xs text-white hover:bg-blue-700"
+            >Ok</button>
+          </div>
+        )}
+      </div>
+    </Field>
   )
 }
 

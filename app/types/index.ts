@@ -270,8 +270,8 @@ export const AMB: Record<SokajyType, string[]> = {
 }
 
 const Y = new Date().getFullYear()
-export const YEARS = Array.from({ length: 6 }, (_, i) => { const y = Y - 2 + i; return `${y}-${y + 1}` })
-export const CURRENT_YEAR = `${Y}-${Y + 1}`
+export const YEARS = Array.from({ length: 6 }, (_, i) => { const y = Y - 1 + i; return `${y}-${y + 1}` })
+export const CURRENT_YEAR = `${Y - 1}-${Y}`
 
 export const FIOFANANA_DINGAM = [
   'FANOMANANA A', 'FANOMANANA B', 'FANOMANANA D', 'FANOMANANA E', 'FANOMANANA F',
