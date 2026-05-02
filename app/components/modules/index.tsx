@@ -235,7 +235,8 @@ export function AdminModule() {
         <Empty message="Tsy misy mpampiasa voasoratra" />
       ) : (
         <div className="card overflow-hidden p-0">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
             <thead className="bg-gray-50">
               <tr>
                 {['Anarana', 'Email', 'Sampana', 'Statut', 'Super Admin', 'Daty', ''].map(h => (
@@ -293,6 +294,7 @@ export function AdminModule() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>
