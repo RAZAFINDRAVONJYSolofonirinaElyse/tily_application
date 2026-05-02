@@ -12,6 +12,7 @@ export async function getSession(req: NextRequest): Promise<SessionUser | null> 
 
 export function canModify(user: SessionUser, sokajy?: string | null): boolean {
   if (user.sampana === 'tonia' || user.isSuperAdmin) return true
+  if (sokajy === 'mpiandraikitra') return true
   return user.sampana === sokajy
 }
 

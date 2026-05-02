@@ -39,7 +39,7 @@ export default function Sidebar({ mobileOpen, onClose }: { mobileOpen: boolean; 
   const handleCat = (k: SokajyType) => { setCat(k); onClose() }
 
   const allowedCats = (Object.keys(CATS) as SokajyType[]).filter(k =>
-    isTonia || k === (user.sampana as SokajyType)
+    isTonia || k === (user.sampana as SokajyType) || k === 'mpiandraikitra'
   )
 
   return (
